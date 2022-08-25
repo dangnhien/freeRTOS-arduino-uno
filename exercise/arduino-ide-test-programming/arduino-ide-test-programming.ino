@@ -1,46 +1,52 @@
 #include <Arduino.h>
 
 #include <Arduino_FreeRTOS.h>
-#include"semphr.h"
+#include <queue.h>
 
-static const char *pcStringToPrint[] =
-{
-  "Task 1 ############################## Task1 \r\n",
-  "Task 2 ------------------------------ Task2 \r\n",  
-};
+QueueHandle_t xMailbox;
+TaskHandle_t TaskHandle_1; // handler for Task1
+TaskHandle_t TaskHandle_2; // handler for Task2
 
-QueueHandle_t xPrintQueue;
+void vUpdateMailbox(void);
+BaseType_t vReadMailbox(void);
+
+
 void setup()
 {
-   Serial.begin(9600);
-  xPrintQueue = xQueueCreate(5,sizeof(char *));
-  xTaskCreate(SenderTask,"Printer Task1", 100,(void *)0,1,NULL );
-  xTaskCreate(SenderTask,"Printer Task2", 100,(void *)1,2,NULL );
-  xTaskCreate(GateKeeperTask, "GateKeeper", 100,NULL,0,NULL);
-  
+    // put your setup code here, to run once:
+    Serial.begin(9600);
+    xMailbox = xQueueCreate(1, sizeof(int32_t));
+    //Serial.begin(9600); // Enable serial communication library.
+    xTaskCreate(vUpdateMailbox, "Sender", 100, NULL, 1, &TaskHandle_1);
+    xTaskCreate(vReadMailbox, "Receiver", 100, NULL, 1, &TaskHandle_2);
 }
-void SenderTask(void *pvParameters)
+
+void loop()
 {
-  int indexToString ;
-  indexToString = (int)pvParameters;
-
-  while(1)
-  {
-   xQueueSend(xPrintQueue,&(pcStringToPrint[indexToString]),portMAX_DELAY); 
-   vTaskDelay(pdMS_TO_TICKS(100));
-
-  }
-  
+    // put your main code here, to run repeatedly:
 }
 
-void GateKeeperTask(void *pvParameters)
+
+void vUpdateMailbox(void)
 {
-  char *pcMessageToPrint;
-  while(1)
-  {
-   xQueueReceive(xPrintQueue,&pcMessageToPrint,portMAX_DELAY);
-   Serial.println(pcMessageToPrint); 
-  }
+    int32_t ulNewValue = 1;
+    while (1)
+    {
+        xQueueOverwrite(xMailbox, &ulNewValue);
+        Serial.println("Data written to mailbox");
+        ulNewValue++;
+        vTaskDelay(500);
+    }
 }
 
-void loop(){}
+BaseType_t vReadMailbox(void)
+{
+    int32_t value_received;
+    while (1)
+    {
+        xQueuePeek(xMailbox, &value_received, portMAX_DELAY);
+        Serial.print("Data Read from mailbox = ");
+        Serial.println(value_received);
+        vTaskDelay(100);
+    }
+}

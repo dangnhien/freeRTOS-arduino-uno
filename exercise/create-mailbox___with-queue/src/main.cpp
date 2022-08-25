@@ -6,12 +6,17 @@
 QueueHandle_t xMailbox;
 TaskHandle_t TaskHandle_1; // handler for Task1
 TaskHandle_t TaskHandle_2; // handler for Task2
+
+void vUpdateMailbox(void);
+BaseType_t vReadMailbox(void);
+
+
 void setup()
 {
     // put your setup code here, to run once:
     Serial.begin(9600);
     xMailbox = xQueueCreate(1, sizeof(int32_t));
-    Serial.begin(9600); // Enable serial communication library.
+    //Serial.begin(9600); // Enable serial communication library.
     xTaskCreate(vUpdateMailbox, "Sender", 100, NULL, 1, &TaskHandle_1);
     xTaskCreate(vReadMailbox, "Receiver", 100, NULL, 1, &TaskHandle_2);
 }
@@ -20,6 +25,8 @@ void loop()
 {
     // put your main code here, to run repeatedly:
 }
+
+
 void vUpdateMailbox(void)
 {
     int32_t ulNewValue = 1;
