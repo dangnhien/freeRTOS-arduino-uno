@@ -1,0 +1,36 @@
+I.Quản lý tác vụ và queue
+	I.1.Task
+		1.Tạo task.
+		2.Thay đổi mức độ ưu tiên.
+		3.Lấy mức độ ưu tiên.
+		4.Đình chỉ task.
+		5.Phục hồi tast.
+		6.Xoá task.
+	I.2.Queue
+	
+	I.3.Đồng bộ task 
+		1.Semaphore
+			Lấy xong không cần trả token
+			1.1.Binary Semaphore
+				Hiểu như queue có 1 phần tử
+			1.2.Counting Semaphore
+		2.Mutex
+			Lấy xong phải trả token
+	
+	I.4.Truyền thông liên tác vụ
+		1.
+		2.
+		3.Message pasing
+			Mailbox
+	
+
+II.Quản lý ngắt
+
+
+
+III.Quản lý mã nguồn và bộ nhớ
+
+
+
+
+IV.Xử lý sự cố

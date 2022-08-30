@@ -1,52 +1,77 @@
 #include <Arduino.h>
 
 #include <Arduino_FreeRTOS.h>
-#include <queue.h>
+#include <task.h>
 
-QueueHandle_t xMailbox;
-TaskHandle_t TaskHandle_1; // handler for Task1
-TaskHandle_t TaskHandle_2; // handler for Task2
+TaskHandle_t TaskHandle_1 = NULL;
+TaskHandle_t TaskHandle_2 = NULL;
 
-void vUpdateMailbox(void);
-BaseType_t vReadMailbox(void);
-
+void MyTask1(void *pvParameters);
+void MyTask2(void *pvParameters);
+void MyTaskIdle(void *pvParameters);
 
 void setup()
 {
-    // put your setup code here, to run once:
-    Serial.begin(9600);
-    xMailbox = xQueueCreate(1, sizeof(int32_t));
-    //Serial.begin(9600); // Enable serial communication library.
-    xTaskCreate(vUpdateMailbox, "Sender", 100, NULL, 1, &TaskHandle_1);
-    xTaskCreate(vReadMailbox, "Receiver", 100, NULL, 1, &TaskHandle_2);
+  Serial.begin(9600);
+
+  BaseType_t Returned1 = xTaskCreate(MyTask1, "LED1", 64, NULL, 1, &TaskHandle_1);
+  BaseType_t ReturnedIdle = xTaskCreate(MyTaskIdle, "Idle", 64, NULL, 0, NULL);
+
+  if(Returned1 == ReturnedIdle && Returned1 == pdPASS)
+    Serial.println("Start program");
+  else
+    Serial.println("Error!");
+
+  vTaskStartScheduler();
 }
 
 void loop()
 {
-    // put your main code here, to run repeatedly:
+
 }
 
-
-void vUpdateMailbox(void)
+void MyTask1(void *pvParameters)
 {
-    int32_t ulNewValue = 1;
-    while (1)
+  while (1)
+  {
+    static int digit = 0;
+    digit++;
+    (digit>10) ? digit = 0 : digit = digit;
+
+    Serial.println("Task1 run");
+
+    if (digit == 10)
     {
-        xQueueOverwrite(xMailbox, &ulNewValue);
-        Serial.println("Data written to mailbox");
-        ulNewValue++;
-        vTaskDelay(500);
+      xTaskCreate(MyTask2, "LED2", 64, NULL, 2, &TaskHandle_2);
+       Serial.println("Task2 create");
     }
+
+    vTaskDelay(100/ portTICK_PERIOD_MS);
+  }
 }
 
-BaseType_t vReadMailbox(void)
+void MyTask2(void *pvParameters)
 {
-    int32_t value_received;
-    while (1)
+  for (;;)
+  {
+    Serial.println("Task2 run and delete Task1");
+
+    if(TaskHandle_1 != NULL)
     {
-        xQueuePeek(xMailbox, &value_received, portMAX_DELAY);
-        Serial.print("Data Read from mailbox = ");
-        Serial.println(value_received);
-        vTaskDelay(100);
+      vTaskDelete(TaskHandle_1); 
+      TaskHandle_1 = NULL;
     }
+    
+    vTaskDelay(50 / portTICK_PERIOD_MS);
+  }
+}
+
+void MyTaskIdle(void *pvParameters)
+{
+  for (;;)
+  {
+    Serial.println("Task Idle run");
+
+    vTaskDelay(20 / portTICK_PERIOD_MS);
+  }
 }

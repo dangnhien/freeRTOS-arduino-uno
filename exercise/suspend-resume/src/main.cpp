@@ -12,10 +12,14 @@ static void MyTask2(void *pvParameters);
 void setup()
 {
     Serial.begin(9600);
-    Serial.println(F("In Setup function"));
 
-    xTaskCreate(MyTask1, "Task1", 64, NULL, 1, &TaskHandle_1);
-    xTaskCreate(MyTask2, "Task2", 64, NULL, 2, &TaskHandle_2);
+    BaseType_t Returned_Task1 = xTaskCreate(MyTask1, "Task1", 64, NULL, 1, &TaskHandle_1);
+    BaseType_t Returned_Task2 = xTaskCreate(MyTask2, "Task2", 64, NULL, 2, &TaskHandle_2);
+
+    if(Returned_Task1 == Returned_Task2 && Returned_Task1 == pdPASS)
+        Serial.println("Create task successful!");
+    else 
+        Serial.println("Create task fail!");
 }
 
 void loop()
@@ -32,6 +36,7 @@ void MyTask1(void *pvParameters)
         vTaskSuspend(NULL);
 
         Serial.println(F("Task1 running again"));
+        vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }
 
@@ -41,9 +46,11 @@ static void MyTask2(void *pvParameters)
     {
         static int value = 0;
         value++;
+
         if (value == 20)
-            value = 1;
-        if (value == 19)
+            value = 0;
+
+        if (value == 0)
         {
             Serial.println(F("Task2 Resume Task1"));
             vTaskResume(TaskHandle_1);
@@ -52,3 +59,6 @@ static void MyTask2(void *pvParameters)
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }
+
+
+
