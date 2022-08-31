@@ -9,23 +9,36 @@ I.Quản lý tác vụ và queue
 	I.2.Queue
 	
 	I.3.Đồng bộ task 
-		1.Semaphore
+		1.Semaphore - code need one token continue execuse
 			Lấy xong không cần trả token
 			1.1.Binary Semaphore
-				Hiểu như queue có 1 phần tử
-			1.2.Counting Semaphore
+				Counter = 1, loại trừ lẫn nhau , và đồng bộ hoá
+					+ Chức năng đồng bộ hoá --> hiểu như queue có 1 phần tử
+			1.2.Counting Semaphore (có lấy, có trả)
+				- Counter > 1
+				- Đếm sự kiện
+				- Quản lý tài nguyên
 		2.Mutex
-			Lấy xong phải trả token
+			- Lấy xong phải trả token
+			- Loại trừ lẫn nhau
 	
-	I.4.Truyền thông liên tác vụ
-		1.
-		2.
-		3.Message pasing
+	I.4.Truyền thông liên task
+		1.memory sharing - chia sẻ bộ nhớ
+			- Bộ nhớ dùng 
+				+ Global variable (ko dc khuyến khích)
+			- Bảo vệ = mutex, semaphore
+		2.signaling mechanism - cơ chế tín hiệu
+			- event flags - cờ sự kiện
+				+ event grounp (or signal) 
+			- task flags - cờ tác vụ
+				+ Dạng đặc biệt của event flag 
+		3.Message passing - truyền thông điệp
 			Mailbox
 	
 
 II.Quản lý ngắt
-
+	- Dùng Queue
+	- Dùng Semaphone
 
 
 III.Quản lý mã nguồn và bộ nhớ
@@ -34,3 +47,9 @@ III.Quản lý mã nguồn và bộ nhớ
 
 
 IV.Xử lý sự cố
+
+
+
+Từ mới tiếng anh
+
+a context switch to another task : một chuyển đổi ngữ cảnh sang một nhiệm vụ khác

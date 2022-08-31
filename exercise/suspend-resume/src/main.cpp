@@ -36,17 +36,18 @@ void MyTask1(void *pvParameters)
         vTaskSuspend(NULL);
 
         Serial.println(F("Task1 running again"));
+        
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }
 
 static void MyTask2(void *pvParameters)
 {
+    int value = 0;
+
     while (1)
     {
-        static int value = 0;
         value++;
-
         if (value == 20)
             value = 0;
 

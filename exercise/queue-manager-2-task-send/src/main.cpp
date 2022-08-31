@@ -26,8 +26,6 @@ void setup()
   {
     Serial.println("Create queue successful");
 
-    // xTaskCreate(VSendTask, "Sender1", 240, (void *)100, 1, NULL);
-    // xTaskCreate(VSendTask, "Sender2", 240, (void *)200, 1, NULL);
     xTaskCreate(VSend1Task, "Sender1", 64, NULL, 1, NULL);
     xTaskCreate(VSend2Task, "Sender2", 64, NULL, 1, NULL);
 
@@ -42,17 +40,17 @@ void setup()
 void loop()
 {
 
-  if (millis() - time_handles >= 50) // call with period 500 ms
+  if (millis() - time_handles >= 100) // call with period 500 ms
   {
     time_handles = millis();
 
-    Serial.println("infinite loop");
+    //Serial.println("infinite loop");
   }
 }
 
 void VSend1Task(void *pvParameters)
 {
-  static unsigned int lValueToSend = 0;
+  unsigned int lValueToSend = 0;
 
   for (;;)
   {
@@ -72,7 +70,7 @@ void VSend1Task(void *pvParameters)
 
 void VSend2Task(void *pvParameters)
 {
-  static unsigned int lValueToSend1 = 10;
+  unsigned int lValueToSend1 = 10;
 
   for (;;)
   {
@@ -84,7 +82,7 @@ void VSend2Task(void *pvParameters)
     if (lValueToSend1 >= 1000)
       lValueToSend1 = 0;
 
-    vTaskDelay(105 / portTICK_PERIOD_MS);
+    vTaskDelay(100 / portTICK_PERIOD_MS);
 
     // taskYIELD();
   }
@@ -109,7 +107,7 @@ void VReceiveTask(void *pvParameters)
       Serial.println(lReceivedValue2);
     }
 
-    vTaskDelay(110 / portTICK_PERIOD_MS);
+    vTaskDelay(100 / portTICK_PERIOD_MS);
 
     // taskYIELD();
   }

@@ -14,6 +14,7 @@ void VReceiveTask(void *pvParameters);
 void setup()
 {
   Serial.begin(9600);
+
   Serial.println(F("In Setup function"));
 
   xQueue = xQueueCreate(15, sizeof(int));
@@ -24,8 +25,6 @@ void setup()
   {
     Serial.println("Create queue successful");
 
-    // xTaskCreate(VSendTask, "Sender1", 240, (void *)100, 1, NULL);
-    // xTaskCreate(VSendTask, "Sender2", 240, (void *)200, 1, NULL);
     xTaskCreate(VSendTask, "Sender1", 240, NULL, 1, NULL);
     xTaskCreate(VReceiveTask, "Receiver", 240, NULL, 1, NULL);
 
@@ -38,17 +37,17 @@ void setup()
 void loop()
 {
 
-  if (millis() - time_handles >= 50) // call with period 500 ms
+  if (millis() - time_handles >= 100) // call with period 100 ms
   {
-    time_handles = millis();
-
     Serial.println("infinite loop");
+
+    time_handles = millis();
   }
 }
 
 void VSendTask(void *pvParameters)
 {
-  static unsigned int  lValueToSend = 0;
+  unsigned int  lValueToSend = 0;
 
   for (;;)
   {
@@ -67,7 +66,7 @@ void VSendTask(void *pvParameters)
 }
 void VReceiveTask(void *pvParameters)
 {
-   static unsigned int  lReceivedValue = 0;
+  unsigned int  lReceivedValue = 0;
 
   for (;;)
   {

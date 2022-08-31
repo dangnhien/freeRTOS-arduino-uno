@@ -6,9 +6,11 @@
 TaskHandle_t TaskHandle_1;
 TaskHandle_t TaskHandle_2;
 
+unsigned int time_handles=0;
+
 static void MyTask1(void *pvParameters);
 static void MyTask2(void *pvParameters);
-unsigned int time_handles=0;
+
 void setup()
 {
     Serial.begin(9600);
@@ -22,7 +24,7 @@ void setup()
 
 void loop()
 {
-  if(millis()-time_handles >=50)
+  if(millis()-time_handles >=20)
   {
     Serial.println(F("infinite loop"));
     time_handles = millis();
@@ -31,21 +33,20 @@ void loop()
 
 void MyTask1(void *pvParameters)
 {
-    /* Block for 500ms. */
-    const TickType_t  xDelay = 200 / portTICK_PERIOD_MS;
-
+    /* Block for 100ms. */
+    const TickType_t  xDelay = 100 / portTICK_PERIOD_MS;
+    int i=0;
     for (;;)
     {
-      static int i=0;
         i++;
-        if(i==50)
+        if(i==20)
           i=0;
           
         Serial.println(F("Task1 running"));
-        if(i==3)
+        if(i==10)
          vTaskResume(TaskHandle_2);
        
-        if(i==30)
+        if(i==15)
           vTaskDelete(NULL);
           
         vTaskDelay(xDelay);
@@ -54,9 +55,13 @@ void MyTask1(void *pvParameters)
 
 static void MyTask2(void *pvParameters)
 {
+  const TickType_t  xDelay = 100 / portTICK_PERIOD_MS;
     while (1)
     {
         Serial.println(F("Task 2 running"));
         vTaskSuspend(NULL);
+        Serial.println(F("Task 2 running again"));
+
+        vTaskDelay(xDelay);
     }
 }
